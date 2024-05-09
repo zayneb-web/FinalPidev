@@ -30,6 +30,7 @@ const register = async (req, res, next) => {
 
   sendVerificationEmail(newUser, res);
   } catch (err) {
+    console.log(err)
     res.status(500).json({ error: err.message });
   }
 };
@@ -45,11 +46,13 @@ const login = async (req, res, next) => {
     }
 
     // Find user by email
-    const user = await User.findOne({ email }).select("+password").populate({
+    const passwordHash = await hashString(password);
+    console.log("passwordHash",passwordHash);
+    const user = await User.findOne({ email, password : passwordHash },{ password: 0}).populate({
       path: "friends",
-      select: "firstName lastName location profileUrl -password",
+      //select: "firstName lastName location profileUrl -password",
     });
-
+    console.log(user , "user")
     if (!user) {
       next("Invalid email or password");
       return;
@@ -63,14 +66,14 @@ const login = async (req, res, next) => {
     }
 
     // Compare password
-    const isMatch = await CompareString(password, user.password);
+    // const isMatch = await CompareString(password, user.password);
 
-    if (!isMatch) {
-      next("Invalid email or password");
-      return;
-    }
+    // if (!isMatch) {
+    //   next("Invalid email or password");
+    //   return;
+    // }
 
-    user.password = undefined;
+    // user.password = undefined;
 
     const token = createJwt(user._id);
 

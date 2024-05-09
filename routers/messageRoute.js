@@ -6,5 +6,5 @@ router.post('/add', MessageControllers.addMessage);
 
 router.get('/:chatId',MessageControllers.getMessages);
 
-
+router.delete('/:messageId', MessageControllers.removeMessage);
 module.exports = router;

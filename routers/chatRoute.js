@@ -7,6 +7,8 @@ const router = express.Router()
 router.post('/create', chatController.createChat);
 router.get('/:userId' , chatController.userChats);
 router.get('/find/:firstId/:secondId', chatController.findChat);
-router.get('/sidebar', chatController.getUsersForSidebar);
-
+router.get('/search', chatController.getUsersForSidebar);
+router.delete('/delete/:chatId', chatController.deleteChat);
+router.post('/createGroup', chatController.createGroupChat);
+router.post('/leaveGroup/:chatId', chatController.leaveGroupChat);
 module.exports = router;
