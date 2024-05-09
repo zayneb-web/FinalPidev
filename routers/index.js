@@ -12,7 +12,6 @@ const courseRoute = require("./courseRoute.js");
 const taskRoute = require("./taskRoute.js")
 const forumRoute = require("./forum.js")
 
-const storyRouter = require("./story.js")
 
 const router = express.Router();
 
@@ -27,7 +26,6 @@ router.use('/message', MessageRoute);
 
 router.use('/course', courseRoute);
 router.use('/task',taskRoute);
-router.use('/stories', storyRouter);
 
 router.use('/forum',forumRoute);
 

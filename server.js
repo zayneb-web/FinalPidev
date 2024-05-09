@@ -9,7 +9,6 @@ const errorMiddleware = require("./middleware/errorMiddleware.js");
 const router = require("./routers/index.js");
 const mongoose = require("mongoose");
 const multer = require('multer');
-const passport = require("passport");
 const session = require('express-session');
 
 
@@ -72,12 +71,9 @@ mongoose
   );
   
   
-  // Initialize Passport.js
-  app.use(passport.initialize());
-  app.use(passport.session());
+
   
-  // Require and configure Passport.js
-  require("./Controllers/passport.js")(passport);
+
   
   app.use(router);
   
