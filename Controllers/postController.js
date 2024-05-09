@@ -1,6 +1,6 @@
-const User = require("../models/user.js");
 const Posts = require("../Models/postModel.js");
 const Comments = require("../Models/commentsModel.js")
+const User = require("../Models/user.js")
 
 
 const createPost = async (req, res, next) => {

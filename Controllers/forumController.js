@@ -1,6 +1,6 @@
-const User = require("../models/user.js");
 const Question = require("../Models/question.js")
-const Reply = require("../Models/reply.js")
+const Reply = require("../Models/reply.js");
+const User = require("../Models/user.js");
 
 
 const askQuestion = async (req, res) => {
