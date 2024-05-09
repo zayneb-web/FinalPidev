@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 
+
 const { Schema } = mongoose;
+
 
 const eventSchema = new Schema({
   createdBy: {type: Schema.Types.ObjectId, ref: "User" },
@@ -10,10 +12,15 @@ const eventSchema = new Schema({
   location: { type: String,required: true},
   image: { type: String },
   tags: [String],
+  guests: [String],
+  link: { type: String },
   likes: {  type: [String],  default: [], }, // Assuming likes are represented by strings
 },
  { timestamps: true });
 
+
 const Event = mongoose.model('Event', eventSchema);
 
+
 module.exports = Event;
+

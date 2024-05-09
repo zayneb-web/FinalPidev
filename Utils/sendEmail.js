@@ -19,8 +19,6 @@ let transporter = nodemailer.createTransport({
 const sendVerificationEmail = async (user, res) => {
   const { _id, email, lastName } = user;
   const token = _id + uuidv4();
-  console.log('Token:', token); // Log the token
-  console.log('User ID:', _id); // Log the user ID
   const link = APP_URL + "users/verify/" + _id + "/" + token;
   const mailOptions = {
     from: AUTH_EMAIL,
@@ -60,19 +58,19 @@ const sendVerificationEmail = async (user, res) => {
       transporter.sendMail(mailOptions, (err, info) => {
         if (err) {
           console.log(err);
-          res.status(404).json({ message: "Something went wrong" });
+          res.status(404).json({ message: "Something went wrong" , success: false });
         } else {
           res.status(201).send({
-            success: "PENDING",
-            message:
-              "Verification email has been sent to your account. Check your email for further instructions.",
+            success: true,
+            message: "Verification email has been sent to your account. Check your email for further instructions.",
+            user_id : _id
           });
         }
       });
     }
   } catch (error) {
     console.log(error);
-    res.status(404).json({ message: "Something went wrong" });
+    res.status(404).json({ message: "Something went wrong" ,success: false});
   }
 };
 
@@ -81,7 +79,7 @@ const resetPasswordLink = async (user, res) => {
   const token = _id + uuidv4();
   console.log('Token:', token); // Log the token
   console.log('User ID:', _id); // Log the user ID
-  const link = `http://localhost:3000/users/reset-password/${_id}/${token}`; // Update the URL with your backend server address
+  const link = `https://academiaaconnect.onrender.com/users/reset-password/${_id}/${token}`; // Update the URL with your backend server address
   const mailOptions = {
     from: AUTH_EMAIL,
     to: email,
@@ -124,8 +122,38 @@ const resetPasswordLink = async (user, res) => {
   }
 };
 
+const SendReminderMailer=async(email, task)=> {
+  const { title } = task;
+  console.log("email",email)
+  const mailOptions = {
+    from: AUTH_EMAIL,
+    to: email,
+    subject: "Task Reminder",
+    html: `<div style='font-family: Arial, sans-serif; font-size: 20px; color: #333; background-color: #f7f7f7; padding: 20px; border-radius: 5px;'>
+            <p>Hello,</p>
+            <p>This is a reminder that you have a task "${title}" in progress that needs to be completed.</p>
+            <hr>
+            <div style="margin-top: 20px;">
+                <h5>Best Regards</h5>
+                <h5>Your Team</h5>
+            </div>
+          </div>`
+  };
+
+  try {
+    console.log("Sending reminder email...");
+    // Send email and wait for the response
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Reminder email sent successfully!");
+    return { success: true, info };
+  } catch (error) {
+    console.error("Error sending reminder email:", error);
+    return { success: false, error };
+  }
+};
 
 module.exports = {
   sendVerificationEmail,
   resetPasswordLink,
+  SendReminderMailer
 };

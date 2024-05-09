@@ -1,14 +1,17 @@
 const Event = require("../Models/Event");
 
+
 // Créer un événement
 exports.createEvent = async (req, res) => {
   try {
     const { userId } = req.body.user;
-    const { title, description, image, date, location, tags } = req.body;
+    const { title, description, image, date, location, tags, link, guests } = req.body;
+
 
     if (!title || !description || !date || !location) {
       return res.status(400).json({ message: "Title, description, date, and location are required" });
     }
+
 
     const newEvent = await Event.create({
       createdBy: userId,
@@ -18,7 +21,10 @@ exports.createEvent = async (req, res) => {
       date,
       location,
       tags,
+      link,
+      guests,
     });
+
 
     res.status(201).json({
       success: true,
@@ -30,6 +36,7 @@ exports.createEvent = async (req, res) => {
     res.status(500).json({ message: "Failed to create event" });
   }
 };
+
 
 // Obtenir tous les événements paginés
 exports.getEvents = async (req, res) => {
@@ -52,6 +59,7 @@ exports.getEvents = async (req, res) => {
   }
 };
 
+
 // Obtenir un événement par son ID
 exports.getEvent = async (req, res) => {
   const { id } = req.params;
@@ -66,6 +74,7 @@ exports.getEvent = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch event" });
   }
 };
+
 
 // Supprimer un événement
 exports.deleteEvent = async (req, res) => {
@@ -82,11 +91,12 @@ exports.deleteEvent = async (req, res) => {
   }
 };
 
-// Mettre à jour un événement
+
 exports.updateEvent = async (req, res) => {
   const { id } = req.params;
   const { title, description, image, date, location, tags } = req.body;
   try {
+    const { userId } = req.body.user; // Extract the userId from the request body
     const updatedEvent = await Event.findByIdAndUpdate(id, {
       title,
       description,
@@ -94,6 +104,7 @@ exports.updateEvent = async (req, res) => {
       date,
       location,
       tags,
+      userId, // Add userId to the update object
     }, { new: true });
     if (!updatedEvent) {
       return res.status(404).json({ message: "Event not found" });
@@ -104,6 +115,9 @@ exports.updateEvent = async (req, res) => {
     res.status(500).json({ message: "Failed to update event" });
   }
 };
+
+
+
 
 // Obtenir les événements par recherche
 exports.getEventsBySearch = async (req, res) => {
@@ -117,6 +131,7 @@ exports.getEventsBySearch = async (req, res) => {
   }
 };
 
+
 // Obtenir les événements par tag
 exports.getEventsByTag = async (req, res) => {
   const { tag } = req.params;
@@ -128,7 +143,16 @@ exports.getEventsByTag = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch events by tag" });
   }
 };
-
+exports.getEventsByGuests = async (req, res) => {
+  const { guest } = req.params;
+  try {
+    const events = await Event.find({ guests: guest });
+    res.json(events);
+  } catch (error) {
+    console.error("Error fetching events by tag:", error);
+    res.status(500).json({ message: "Failed to fetch events by tag" });
+  }
+};
 // Obtenir les événements liés
 exports.getRelatedEvents = async (req, res) => {
   const { tags } = req.body;
@@ -141,30 +165,44 @@ exports.getRelatedEvents = async (req, res) => {
   }
 };
 
-// Aimer ou désaimer un événement
+
+//like event
 exports.likeEvent = async (req, res) => {
-  const { id } = req.params;
   try {
+    const { userId } = req.body.user;
+    const { id } = req.params;
+
+
     const event = await Event.findById(id);
-    if (!event) {
-      return res.status(404).json({ message: "Event not found" });
-    }
-    const userId = req.userId;
-    const index = event.likes.indexOf(userId);
+
+
+    const index = event.likes.findIndex(pid => pid === String(userId));
+
+
     if (index === -1) {
-      // User has not liked the event, so like it
       event.likes.push(userId);
     } else {
-      // User has already liked the event, so unlike it
-      event.likes.splice(index, 1);
+      event.likes = event.likes.filter(pid => pid !== String(userId));
     }
-    await event.save();
-    res.status(200).json(event);
+
+
+    const updatedEvent = await Event.findByIdAndUpdate(id, event, {
+      new: true,
+    });
+
+
+    res.status(200).json({
+      success: true,
+      message: 'Event liked/unliked successfully',
+      data: updatedEvent,
+    });
   } catch (error) {
-    console.error("Error liking event:", error);
-    res.status(500).json({ message: "Failed to like event" });
+    console.error('Error liking event:', error);
+    res.status(500).json({ message: 'Failed to like event' });
   }
 };
+
+
 
 
 exports.getEventsWithUserId = async (req, res) => {
@@ -177,4 +215,8 @@ exports.getEventsWithUserId = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch user events" });
   }
 };
+
+
+
+
 

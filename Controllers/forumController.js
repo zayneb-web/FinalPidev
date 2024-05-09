@@ -1,6 +1,6 @@
-const Question = require("../Models/question.js")
-const Reply = require("../Models/reply.js");
 const User = require("../Models/user.js");
+const Question = require("../Models/question.js")
+const Reply = require("../Models/reply.js")
 
 
 const askQuestion = async (req, res) => {
@@ -17,10 +17,10 @@ const askQuestion = async (req, res) => {
       res.status(500).json({ message: "Server Error" });
     }
   };
-  
+ 
   const answerQuestion = async (req, res) => {
     const { answer, userId } = req.body;
-  
+ 
     const { id: questionId } = req.params;
     try {
       const reply = await Reply.create({ reply: answer, author: userId });
@@ -34,7 +34,7 @@ const askQuestion = async (req, res) => {
       res.status(500).json({ message: "Server Error" });
     }
   };
-  
+ 
   // general routes
   const getQuestions =  async (req, res) => {
     try {
@@ -54,7 +54,7 @@ const askQuestion = async (req, res) => {
         res.status(500).json({ message: "Server Error" });
       }
   };
-  
+ 
   const UpVote = async (req, res) => {
     const { id: questionId } = req.params;
     const { userId } = req.body;
@@ -63,14 +63,14 @@ const askQuestion = async (req, res) => {
       if (findQuestion.upvote.includes(userId)) {
         return res.status(400).json({ message: "You have already upvoted" });
       }
-  
+ 
       if (findQuestion.downvote.includes(userId)) {
         const downvote = await findQuestion.updateOne({
           $pull: { downvote: userId },
         });
         return res.status(200).json({ message: "Response updated successfully" });
       }
-  
+ 
       const upvote = await findQuestion.updateOne({
         $push: { upvote: userId },
       });
@@ -79,7 +79,7 @@ const askQuestion = async (req, res) => {
       res.status(500).json({ message: "Server Error" });
     }
   };
-  
+ 
 const DownVote = async (req, res) => {
     const { id: questionId } = req.params;
     const { userId } = req.body;
@@ -88,14 +88,14 @@ const DownVote = async (req, res) => {
       if (findQuestion.downvote.includes(userId)) {
         return res.status(400).json({ message: "You have already downvoted" });
       }
-  
+ 
       if (findQuestion.upvote.includes(userId)) {
         const upvote = await findQuestion.updateOne({
           $pull: { upvote: userId },
         });
         return res.status(200).json({ message: "Response updated successfully" });
       }
-  
+ 
       const downvote = await findQuestion.updateOne({
         $push: { downvote: userId },
       });
@@ -104,7 +104,7 @@ const DownVote = async (req, res) => {
       res.status(500).json({ message: "Server Error" });
     }
   };
-  
+ 
   const getAllUsers =  async (req, res) => {
     try {
       const users = await User.find({});
@@ -113,7 +113,7 @@ const DownVote = async (req, res) => {
       res.status(500).json({ message: "Server Error" });
     }
   };
-  
+ 
 const GetQuestionByID = async (req, res) => {
     const { id: userId } = req.params;
     try {
@@ -135,7 +135,7 @@ const GetQuestionByID = async (req, res) => {
       res.status(500).json({ message: "Server Error" });
     }
   };
-  
+ 
   const findTopic =  async (req, res) => {
     const { topic } = req.params;
     try {
@@ -160,6 +160,7 @@ const GetQuestionByID = async (req, res) => {
     }
   };
 
+
   const getTags = async (req, res) => {
     try {
       const tags = await Question.distinct('tags');
@@ -170,4 +171,6 @@ const GetQuestionByID = async (req, res) => {
     }
   }
 
+
   module.exports = { findTopic, GetQuestionByID,getAllUsers,DownVote,UpVote,getQuestions,askQuestion,answerQuestion,getTags};
+
